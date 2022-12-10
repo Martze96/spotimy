@@ -1,0 +1,26 @@
+.App {
+    background-color: #191414;
+    width: 100vw;
+    height: 100vh;
+}
+
+.title-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo {
+    width: 80vw;
+    margin-top: 3vh;
+}
+
+.current-song-box {
+    display: flex;
+    justify-content: center;
+}
+
+.current-song-text {
+    color: white;
+    font-size: 20px;
+}
