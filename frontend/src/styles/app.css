@@ -1,7 +1,7 @@
 .App {
     background-color: #191414;
-    width: 100vw;
-    height: 100vh;
+    width: 98vw;
+    height: 98vh;
     color: white;
     font-family: Arial, Helvetica, sans-serif;
     font-weight: 600;
@@ -45,6 +45,8 @@
 .queue-list {
     background-color: black;
     width: fit-content;
+    margin-top: 20px;
+    border-radius: 10px;
 }
 
 .queue-list-entry-cover {
@@ -56,4 +58,5 @@
     justify-content: space-between;
     align-items: center;
     margin: 15px;
+    border-bottom: 2px solid white;
 }
