@@ -1,14 +1,11 @@
-# spotimy
-
+# Spotimy
+Spotimy is a webapp that lets your party guest decide what songs are going to play next.
+One device of the party is playing spotify music. The webapp communicates with spotify's web-api (via Playing Device's account) to add songs to the player queue
 # setup
 
 npm i in front and backend
 
 Copy the access token from the following sites and paste it in the method the backend function is using
-
-get current song: https://developer.spotify.com/console/get-users-currently-playing-track/?market=&additional_types=
-get User Queue: https://developer.spotify.com/console/get-queue/
-Add Item to Playback Queue: https://developer.spotify.com/console/get-queue/
 
 ## Auth scopes u need:
  * current song: user-read-currently-playing
@@ -18,4 +15,4 @@ Add Item to Playback Queue: https://developer.spotify.com/console/get-queue/
 
 # run 
 frontend: npm run dev
-backend: node index.js
+backend: npm start (nodemon script)
