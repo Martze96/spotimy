@@ -3,18 +3,53 @@ const app = express();
 const port = 3000;
 const cors = require('cors');
 var request = require('request');
-const config = require("./config");
+const env = require('dotenv').config();
+const REDIRECT_URL = 'http://192.168.0.67:5173/callback'
+const REFRESHTOKEN = "";
 
 app.use(cors());
 
+// Refreshing only works with a public link, so first vercel, then try this
+function getRefreshToken() {
+    let scope = "user-read-currently-playing user-read-playback-state user-modify-playback-state";
+    let options = {
+        response_type: 'code',
+        client_id: process.env.CLIENT_ID,
+        scope: scope,
+        redirect_uri: REDIRECT_URL
+    }
+    request('https://accounts.spotify.com/authorize?' + JSON.stringify(options));
+}
 
-/*
-const spotifyApi = new SpotifyWebApi({
-    clientId: 'e2c1897e211042d599791c8c16304b64',
-    clientSecret: 'b10e6b2e558949579df8c10640afa51d',
+app.get('/callback', function (req, res) {
+
+    var code = req.query.code || null;
+
+    var authOptions = {
+        url: 'https://accounts.spotify.com/api/token',
+        form: {
+            code: code,
+            redirect_uri: redirect_uri,
+            grant_type: 'authorization_code'
+        },
+        headers: {
+            'Authorization': 'Basic ' + (new Buffer(process.env.CLIENT_ID + ':' + process.env.CLIENT_SECRET).toString('base64'))
+        },
+        json: true
+    };
+    request.post(authOptions, function (error, response, body) {
+        if (!error && response.statusCode === 200) {
+            var access_token = body.access_token;
+            console.log(response);
+            /*
+            res.send({
+              'access_token': access_token
+            });*/
+        } else { console.log(error) }
+    });
+
 });
-spotifyApi.setAccessToken("BQBS1rbAArovLHTpYO91Lk9WQUilpfuYdUL8rK5PIYYe4YuiPa2UXWQhZ");
-*/
+//getRefreshToken()
 
 
 app.get("/getCurrentSong", (req, res) => {
@@ -25,12 +60,11 @@ app.get("/getCurrentSong", (req, res) => {
         'headers': {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${config.ACCESS_TOKEN_CURRENTSONG}`
+            'Authorization': `Bearer ${process.env.ACCESS_TOKEN}`
         }
     };
     request(options, function (error, response) {
         if (error) throw new Error(error);
-        console.log("AB HIER!!   : ", JSON.parse(response.body));
         if (!response.body || !JSON.parse(response.body).is_playing) {
             res.send("No Song is currently playing or is not available.")
         } else {
@@ -57,18 +91,19 @@ app.get("/getQueue", (req, res) => {
         'headers': {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${config.ACCESS_TOKEN_GETQUEUE}`
+            'Authorization': `Bearer ${process.env.ACCESS_TOKEN}`
         }
     };
     request(options, function (error, response) {
         if (error) throw new Error(error);
         let answer = response.body;
         answer = JSON.parse(answer);
-        if (answer.queue.length < 1) {
+        if (answer?.error || answer === "") {
+            console.log("queue empty or not reachable...")
             res.send("Queue is currently empty.");
         } else {
             let queueTracks = [];
-            for (let i = 0; i < Object.keys(answer).length; i++) {
+            for (let i = 0; i < Object.keys(answer.queue).length; i++) {
                 let songName = answer.queue[i].name;
                 let artistName = answer.queue[i].artists[0].name;
                 let songImage = answer.queue[i].album.images[0].url;
@@ -78,10 +113,80 @@ app.get("/getQueue", (req, res) => {
                     image: songImage
                 });
             }
+            console.log("sending queue...")
             res.send(queueTracks);
         }
 
     });
+})
+
+app.get("/search/?:name/?:artist", (req, res) => {
+    let name = req.params.name;
+    let artist = req.params.artist;
+    console.log(req.params);
+    if (!name && !artist) { res.status(404).send('No searchinput given.') }
+    else {
+        name = name ? "%20" + name : "";
+        artist = artist ? "%20artist:" + artist : "";
+        var request = require('request');
+        var options = {
+            'method': 'GET',
+            'url': `https://api.spotify.com/v1/search?q=${name}${artist}&type=track&limit=10`,
+            'headers': {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${process.env.ACCESS_TOKEN}`
+            }
+        };
+        request(options, function (error, response) {
+            if (error) throw new Error(error);
+            let tracks = JSON.parse(response.body).tracks.items;
+            let searchResult = [];
+            for (let i = 0; i < tracks.length; i++) {
+                searchResult.push({
+                    artist: tracks[i].artists[0].name,
+                    name: tracks[i].name,
+                    image: tracks[i].album.images[0].url,
+                    uri: tracks[i].uri
+                })
+            }
+            console.log(searchResult);
+            res.status(200).send(searchResult);
+        });
+    }
+})
+
+app.get("/addToQueue/:id", (req, res) => {
+    let songId = req.params.id;
+
+    var options = {
+        'method': 'GET',
+        'url': `https://api.spotify.com/v1/me/player/devices`,
+        'headers': {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.ACCESS_TOKEN}`
+        }
+    };
+    request(options, (err, res) => {
+        let deviceList = JSON.parse(res.body).devices;
+        let playingDevice = deviceList.find(device => device['is_active']);
+        console.log(playingDevice);
+        var options = {
+            'method': 'POST',
+            'url': `https://api.spotify.com/v1/me/player/queue?uri=${songId}&deviceId=${playingDevice}`,
+            'headers': {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${process.env.ACCESS_TOKEN}`
+            }
+        }
+        request(options, (err, res) => {
+            if (err) { console.log(err) } else {
+                console.log("song added!");
+            }
+        })
+    })
 })
 
 

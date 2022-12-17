@@ -3,34 +3,124 @@ import { useState, useEffect } from 'react'
 import './styles/app.css'
 import logo from './assets/logo.png'
 import axios from 'axios';
+import Modal from 'react-modal';
+import './styles/modal.css'
+
+const customStyles = {
+  content: {
+    top: '45%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+    background: 'linear-gradient(180deg, rgba(0, 75, 15, 1) 0%, rgba(25, 20, 20, 1) 50%)',
+    borderRadius: "25px",
+    overflowY: "hidden",
+    boxShadow: "0 0 10px 10px grey",
+    border: "none"
+  },
+};
+
+Modal.setAppElement('#root');
 
 function App() {
   const [currentSongInfo, setCurrentSongInfo] = useState([])
   const [songQueue, setSongQueue] = useState([]);
   const [queueList, setQueueList] = useState({});
+  const [searchName, setSearchName] = useState("");
+  const [searchArtist, setSearchArtist] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+
+  const [modalIsOpen, setIsOpen] = useState(false);
+
+  function openModal() {
+    setIsOpen(true);
+  }
+
+  function afterOpenModal() {
+    // references are now sync'd and can be accessed.
+  }
+
+  function closeModal() {
+    setIsOpen(false);
+  }
+
+  function handleSearchNameChange(event) {
+    console.log(searchName);
+    setSearchName(event.target.value);
+  }
+
+  function handleSearchArtistChange(event) {
+    setSearchArtist(event.target.value);
+  }
+
+  function search() {
+    axios.get(`http://192.168.0.67:3000/search/${searchName}/${searchArtist}`).then(res => setSearchResults(res.data));
+  }
+
+  function handleAdd(event) {
+    console.log(event.target.parentNode.getAttribute("id"));
+    let songId = event.target.parentNode.getAttribute("id");
+    axios.get(`http://192.168.0.67:3000/addToQueue/${songId}`)
+    // need uri of song "spotify:track:4iV5W9uYEdYUVa79Axb7Rh"
+    // need id of device "0d1841b0976bae2a3a310dd74c0f3df354899bc8"
+  }
+
 
 
   useEffect(() => {
     const interval = setInterval(() => {
       axios.get("http://192.168.0.67:3000/getCurrentSong").then(res => { setCurrentSongInfo(res.data); console.log(res.data) });
       axios.get("http://192.168.0.67:3000/getQueue").then(res => { setSongQueue(res.data); console.log(res.data); })
-    }, 3000);
+    }, 10000);
     return () => clearInterval(interval);
   }, [])
 
   return (
-    <div className="App">
-      <div className='title-box'>
+    <div className="App" id="App">
+      <div className='title-box' id="mytitle">
         <img src={logo} alt="logo" className="logo" />
       </div>
       <div className="current-song-box">
-        <div>Aktuell wird folgender Song abgespielt:</div>
+        <div style={{ padding: "10px" }}>Aktuell wird folgender Song abgespielt:</div>
         <img src={currentSongInfo[2]} alt="Cover des aktuellen Songs" className='current-song-cover-image' />
-        <div style={{ fontWeight: 200 }}>{currentSongInfo[0]}</div>
+        <div style={{ fontWeight: 200, padding: "10px" }}>{currentSongInfo[0]}</div>
         <div style={{ fontSize: "1.2rem" }}>{currentSongInfo[1]}</div>
       </div>
+      <div className="add-song-button" onClick={openModal}>+ Song hinzufügen</div>
+      <Modal
+        isOpen={modalIsOpen}
+        onAfterOpen={afterOpenModal}
+        onRequestClose={closeModal}
+        style={customStyles}
+        contentLabel="Example Modal"
+      >
+        <div className='modal-container'>
+          <div className='modal-top-bar'>
+            <div>Suche einen Song </div>
+          </div>
+          <div className='modal-searchbar'>
+            <input value={searchName} className='modal-song-input' placeholder='Songtitel' onChange={handleSearchNameChange} />
+          </div>
+          <div className='modal-searchbar'>
+            <input value={searchArtist} className='modal-song-input' placeholder='Interpret' onChange={handleSearchArtistChange} />
+          </div>
+          <div className='modal-search-button' onClick={search}>Suchen</div>
+          <div className='modal-result-list'>
+            {searchResults[0]?.name ? searchResults.map((item, index) => {
+              return (<div className='search-list-entry' id={item.uri}>
+                <img src={item.image} alt="searchresult-songcover" className='search-list-entry-cover' />
+                <div className='searchlist-song-name'>{item.name}</div>
+                <div className='searchlist-song-artist'>{item.artist}</div>
+                <div className='searchlist-addtoqueue-button' onClick={handleAdd}>+</div>
+              </div>)
+            }) : ""}
+          </div>
+        </div>
+      </Modal>
       <div className='queue-box'>
-        <div>Diese Lieder werden als Nächstes abgespielt:</div>
+        <div>Diese Songs werden als Nächstes abgespielt:</div>
         <div className="queue-list">
           {/*queueList*/}
           {songQueue[0]?.name ? songQueue.map(item => {

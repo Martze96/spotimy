@@ -10,6 +10,12 @@ get current song: https://developer.spotify.com/console/get-users-currently-play
 get User Queue: https://developer.spotify.com/console/get-queue/
 Add Item to Playback Queue: https://developer.spotify.com/console/get-queue/
 
+## Auth scopes u need:
+ * current song: user-read-currently-playing
+ * getqueue: user-read-playback-state
+ * setqueue: user-modify-playback-state
+ * search: no scope
+
 # run 
 frontend: npm run dev
 backend: node index.js
