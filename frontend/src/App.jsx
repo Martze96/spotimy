@@ -14,7 +14,7 @@ const customStyles = {
     bottom: 'auto',
     marginRight: '-50%',
     transform: 'translate(-50%, -50%)',
-    background: 'linear-gradient(180deg, rgba(0, 75, 15, 1) 0%, rgba(25, 20, 20, 1) 50%)',
+    background: 'linear-gradient(180deg, rgba(0, 75, 15, 1) 0%, rgba(25, 20, 20, 1) 25%)',
     borderRadius: "25px",
     overflowY: "hidden",
     boxShadow: "0 0 10px 10px grey",
