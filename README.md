@@ -21,9 +21,11 @@ backend: npm start (nodemon script)
 - Success Alert if song got added
 - Refresh rate faster
 - Spotimy x Miller's Logo
+- added logos to searchbar
+
 
 # TODO
-
 - No song visualization
 - Only input Song or Artist
 - search by trackid (use share song link and grab link from url)
+- Add assets to public folder(then you can add them to readme )
