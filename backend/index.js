@@ -6,11 +6,12 @@ var request = require('request');
 const env = require('dotenv').config();
 const REDIRECT_URL = 'https://spotimy-backend.vercel.app/callback'
 const REFRESHTOKEN = "";
+let ANSWER = "";
 
 app.use(cors());
 
 // Refreshing only works with a public link, so first vercel, then try this
-function getRefreshToken() {
+async function getRefreshToken() {
     let scope = "user-read-currently-playing user-read-playback-state user-modify-playback-state";
     let options = {
         response_type: 'code',
@@ -20,6 +21,15 @@ function getRefreshToken() {
     }
     request('https://accounts.spotify.com/authorize?' + JSON.stringify(options));
 }
+
+app.get('/getToken', function (req, res) {
+    getRefreshToken();
+})
+
+app.get('/showMessage', (req, res) => {
+    res.send(ANSWER);
+})
+
 
 app.get('/callback', function (req, res) {
 
@@ -42,15 +52,18 @@ app.get('/callback', function (req, res) {
             var access_token = body.access_token;
             console.log(response);
             console.log(access_token);
-            /*
+            ANSWER = body;
             res.send({
-              'access_token': access_token
-            });*/
-        } else { console.log(error) }
+                'access_token': access_token,
+                'spotify answer': body
+            });
+        } else { console.log("Error from Spotify: " + error) }
     });
 
 });
-getRefreshToken();
+
+
+
 
 
 app.get("/getCurrentSong", (req, res) => {
