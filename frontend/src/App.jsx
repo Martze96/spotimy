@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react'
 import './styles/app.css'
 import logo from './assets/logo.png'
 import coopLogo from './assets/eventlogo.png'
+import PersonLogo from './assets/person.svg'
+import NoteLogo from './assets/note.svg'
 import axios from 'axios';
 import Modal from 'react-modal';
 import './styles/modal.css'
@@ -106,9 +108,11 @@ function App() {
             <div>Suche einen Song </div>
           </div>
           <div className='modal-searchbar'>
+            <img src={NoteLogo} alt="Songtitel" className='searchinput-logo' />
             <input value={searchName} className='modal-song-input' placeholder='Songtitel' onChange={handleSearchNameChange} />
           </div>
           <div className='modal-searchbar'>
+            <img src={PersonLogo} alt="Songtitel" className='searchinput-logo' />
             <input value={searchArtist} className='modal-song-input' placeholder='Interpret' onChange={handleSearchArtistChange} />
           </div>
           <div className='modal-search-button' onClick={search}>Suchen</div>
