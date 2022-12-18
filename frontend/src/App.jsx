@@ -26,7 +26,7 @@ const customStyles = {
 };
 
 const PROD_API_SERVER = "https://spotimy-backend-martze96.vercel.app"
-const LOCAL_API_SERVER = "http://localhost:3000"
+const LOCAL_API_SERVER = "http://192.168.0.67:3000"
 
 Modal.setAppElement('#root');
 
@@ -62,13 +62,13 @@ function App() {
   }
 
   function search() {
-    axios.get(`${PROD_API_SERVER}/search/${searchName}/${searchArtist}`).then(res => setSearchResults(res.data));
+    axios.get(`${LOCAL_API_SERVER}/search/${searchName}/${searchArtist}`).then(res => setSearchResults(res.data));
   }
 
   function handleAdd(event) {
     console.log(event.target.parentNode.getAttribute("id"));
     let songId = event.target.parentNode.getAttribute("id");
-    axios.get(`${PROD_API_SERVER}/addToQueue/${songId}`)
+    axios.get(`${LOCAL_API_SERVER}/addToQueue/${songId}`)
     closeModal();
     // need uri of song "spotify:track:4iV5W9uYEdYUVa79Axb7Rh"
     // need id of device "0d1841b0976bae2a3a310dd74c0f3df354899bc8"
@@ -78,8 +78,8 @@ function App() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      axios.get(`${PROD_API_SERVER}/getCurrentSong`).then(res => { setCurrentSongInfo(res.data); console.log(res.data) });
-      axios.get(`${PROD_API_SERVER}/getQueue`).then(res => { setSongQueue(res.data); console.log(res.data); })
+      axios.get(`${LOCAL_API_SERVER}/getCurrentSong`).then(res => { setCurrentSongInfo(res.data); console.log(res.data) });
+      axios.get(`${LOCAL_API_SERVER}/getQueue`).then(res => { setSongQueue(res.data); console.log(res.data); })
     }, 3000);
     return () => clearInterval(interval);
   }, [])

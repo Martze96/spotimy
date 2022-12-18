@@ -4,7 +4,7 @@ const port = 3000;
 const cors = require('cors');
 var request = require('request');
 const env = require('dotenv').config();
-const REDIRECT_URL = 'http://192.168.0.67:5173/callback'
+const REDIRECT_URL = 'https://spotimy-backend.vercel.app/callback'
 const REFRESHTOKEN = "";
 
 app.use(cors());
@@ -41,6 +41,7 @@ app.get('/callback', function (req, res) {
         if (!error && response.statusCode === 200) {
             var access_token = body.access_token;
             console.log(response);
+            console.log(access_token);
             /*
             res.send({
               'access_token': access_token
@@ -49,7 +50,7 @@ app.get('/callback', function (req, res) {
     });
 
 });
-//getRefreshToken()
+getRefreshToken();
 
 
 app.get("/getCurrentSong", (req, res) => {
