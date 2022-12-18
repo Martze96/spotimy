@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import './styles/app.css'
 import logo from './assets/logo.png'
+import coopLogo from './assets/eventlogo.png'
 import axios from 'axios';
 import Modal from 'react-modal';
 import './styles/modal.css'
@@ -66,6 +67,7 @@ function App() {
     console.log(event.target.parentNode.getAttribute("id"));
     let songId = event.target.parentNode.getAttribute("id");
     axios.get(`${PROD_API_SERVER}/addToQueue/${songId}`)
+    closeModal();
     // need uri of song "spotify:track:4iV5W9uYEdYUVa79Axb7Rh"
     // need id of device "0d1841b0976bae2a3a310dd74c0f3df354899bc8"
   }
@@ -76,14 +78,14 @@ function App() {
     const interval = setInterval(() => {
       axios.get(`${PROD_API_SERVER}/getCurrentSong`).then(res => { setCurrentSongInfo(res.data); console.log(res.data) });
       axios.get(`${PROD_API_SERVER}/getQueue`).then(res => { setSongQueue(res.data); console.log(res.data); })
-    }, 10000);
+    }, 3000);
     return () => clearInterval(interval);
   }, [])
 
   return (
     <div className="App" id="App">
       <div className='title-box' id="mytitle">
-        <img src={logo} alt="logo" className="logo" />
+        <img src={coopLogo} alt="logo" className="logo" />
       </div>
       <div className="current-song-box">
         <div style={{ padding: "10px" }}>Aktuell wird folgender Song abgespielt:</div>

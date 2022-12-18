@@ -16,3 +16,14 @@ Copy the access token from the following sites and paste it in the method the ba
 # run 
 frontend: npm run dev
 backend: npm start (nodemon script)
+
+# 18.12.2022 Update
+- Success Alert if song got added
+- Refresh rate faster
+- Spotimy x Miller's Logo
+
+# TODO
+
+- No song visualization
+- Only input Song or Artist
+- search by trackid (use share song link and grab link from url)
