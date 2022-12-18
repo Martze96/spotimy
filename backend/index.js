@@ -24,6 +24,7 @@ async function getRefreshToken() {
 
 app.get('/getToken', function (req, res) {
     getRefreshToken();
+    res.send("okay i did, now /showMessage for the message")
 })
 
 app.get('/showMessage', (req, res) => {
@@ -57,7 +58,7 @@ app.get('/callback', function (req, res) {
                 'access_token': access_token,
                 'spotify answer': body
             });
-        } else { console.log("Error from Spotify: " + error) }
+        } else { res - send("Spotify Error: " + error); console.log("Error from Spotify: " + error) }
     });
 
 });
