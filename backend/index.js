@@ -58,7 +58,7 @@ app.get('/callback', function (req, res) {
                 'access_token': access_token,
                 'spotify answer': body
             });
-        } else { res - send("Spotify Error: " + error); console.log("Error from Spotify: " + error) }
+        } else { res.send("Spotify Error: " + error); console.log("Error from Spotify: " + error) }
     });
 
 });
