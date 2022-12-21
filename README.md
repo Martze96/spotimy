@@ -17,6 +17,10 @@ Copy the access token from the following sites and paste it in the method the ba
 frontend: npm run dev
 backend: npm start (nodemon script)
 
+# 21.12.2022 Update
+- Implemented Access Token Granting and Refreshing
+- Switch Mode Prod URI and Local URI
+
 # 18.12.2022 Update
 - Success Alert if song got added
 - Refresh rate faster
@@ -29,3 +33,7 @@ backend: npm start (nodemon script)
 - Only input Song or Artist
 - search by trackid (use share song link and grab link from url)
 - Add assets to public folder(then you can add them to readme )
+- get access and token
+    -> build grant access in frontend
+    -> save access Token and make Requests with it (server has to use it in Requests)
+    -> save refresh token, set interval? and server should make requests to get new Token

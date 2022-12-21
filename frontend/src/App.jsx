@@ -24,7 +24,7 @@ const customStyles = {
     border: "none"
   },
 };
-
+const IS_PROD = true;
 const PROD_API_SERVER = "https://spotimy-backend-martze96.vercel.app"
 const LOCAL_API_SERVER = "http://192.168.0.67:3000"
 
@@ -62,13 +62,17 @@ function App() {
   }
 
   function search() {
-    axios.get(`${LOCAL_API_SERVER}/search/${searchName}/${searchArtist}`).then(res => setSearchResults(res.data));
+    axios.get(`${IS_PROD ? PROD_API_SERVER : LOCAL_API_SERVER}/search/${searchName}/${searchArtist}`).then(res => setSearchResults(res.data));
+  }
+
+  function getToken() {
+    axios.get(`${IS_PROD ? PROD_API_SERVER : LOCAL_API_SERVER}/getToken`).then(res => { document.open(); document.write(res.data); document.close(); })
   }
 
   function handleAdd(event) {
     console.log(event.target.parentNode.getAttribute("id"));
     let songId = event.target.parentNode.getAttribute("id");
-    axios.get(`${LOCAL_API_SERVER}/addToQueue/${songId}`)
+    axios.get(`${IS_PROD ? PROD_API_SERVER : LOCAL_API_SERVER}/addToQueue/${songId}`)
     closeModal();
     // need uri of song "spotify:track:4iV5W9uYEdYUVa79Axb7Rh"
     // need id of device "0d1841b0976bae2a3a310dd74c0f3df354899bc8"
@@ -78,8 +82,8 @@ function App() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      axios.get(`${LOCAL_API_SERVER}/getCurrentSong`).then(res => { setCurrentSongInfo(res.data); console.log(res.data) });
-      axios.get(`${LOCAL_API_SERVER}/getQueue`).then(res => { setSongQueue(res.data); console.log(res.data); })
+      axios.get(`${IS_PROD ? PROD_API_SERVER : LOCAL_API_SERVER}/getCurrentSong`).then(res => { setCurrentSongInfo(res.data); console.log(res.data) });
+      axios.get(`${IS_PROD ? PROD_API_SERVER : LOCAL_API_SERVER}/getQueue`).then(res => { setSongQueue(res.data); console.log(res.data); })
     }, 3000);
     return () => clearInterval(interval);
   }, [])
@@ -95,6 +99,7 @@ function App() {
         <div style={{ fontWeight: 200, padding: "10px" }}>{currentSongInfo[0]}</div>
         <div style={{ fontSize: "1.2rem" }}>{currentSongInfo[1]}</div>
       </div>
+      <div onClick={getToken}>Get a Token!</div>
       <div className="add-song-button" onClick={openModal}>+ Song hinzufügen</div>
       <Modal
         isOpen={modalIsOpen}

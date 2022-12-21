@@ -4,14 +4,101 @@ const port = 3000;
 const cors = require('cors');
 var request = require('request');
 const env = require('dotenv').config();
+
+const IS_PROD = true;
+const LOCAL_REDIRECT_URI = 'http://192.168.0.67:3000/login';
+const PROD_REDIRECT_URI = 'https://spotimy-backend.vercel.app/login';
+
+app.use(cors());
+/**
+ * ************ HANDLE AUTH AND TOKEN *********************************
+ */
+const SpotifyWebApi = require('spotify-web-api-node');
+
+var generateRandomString = function (length) {
+    var text = '';
+    var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+    for (var i = 0; i < length; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+
+    return text;
+};
+
+var scopes = ['user-read-currently-playing', 'user-read-playback-state', 'user-modify-playback-state'],
+    redirectUri = `${IS_PROD ? PROD_REDIRECT_URI : LOCAL_REDIRECT_URI}`,
+    clientId = process.env.CLIENT_ID,
+    clientSecret = process.env.CLIENT_SECRET,
+    state = generateRandomString(16);
+
+// Setting credentials can be done in the wrapper's constructor, or using the API object's setters.
+var spotifyApi = new SpotifyWebApi({
+    redirectUri: redirectUri,
+    clientId: clientId,
+    clientSecret: clientSecret
+});
+
+// Create the authorization URL
+var authorizeURL = spotifyApi.createAuthorizeURL(scopes, state);
+
+// https://accounts.spotify.com:443/authorize?client_id=5fe01282e44241328a84e7c5cc169165&response_type=code&redirect_uri=https://example.com/callback&scope=user-read-private%20user-read-email&state=some-state-of-my-choice
+console.log(authorizeURL);
+
+let code;
+app.get('/login', function (req, res) {
+    code = req.query.code;
+    console.log(code);
+
+    spotifyApi.authorizationCodeGrant(code).then(
+        function (data) {
+            console.log('The token expires in ' + data.body['expires_in']);
+            console.log('The access token is ' + data.body['access_token']);
+            console.log('The refresh token is ' + data.body['refresh_token']);
+
+            // Set the access token on the API object to use it in later calls
+            spotifyApi.setAccessToken(data.body['access_token']);
+            spotifyApi.setRefreshToken(data.body['refresh_token']);
+        },
+        function (err) {
+            console.log(code);
+            console.log('Something went wrong!', err);
+        }
+    );
+
+});
+// The code that's returned as a query parameter to the redirect URI
+// Retrieve an access token and a refresh token
+
+
+// clientId, clientSecret and refreshToken has been set on the api object previous to this call.
+function refreshSpotifyToken() {
+    spotifyApi.refreshAccessToken().then(
+        function (data) {
+            console.log('The access token has been refreshed!');
+
+            // Save the access token so that it's used in future calls
+            spotifyApi.setAccessToken(data.body['access_token']);
+            console.log('The access token is ' + data.body['access_token']);
+            console.log('The token expires in ' + data.body['expires_in']);
+        },
+        function (err) {
+            console.log('Could not refresh access token', err);
+        });
+};
+app.on('ready', () => {
+    refreshSpotifyToken();
+    setInterval(refreshSpotifyToken, 1000 * 59 * 59);
+})
+
+/*
 const REDIRECT_URL = 'https://spotimy-backend.vercel.app/callback'
 const REFRESHTOKEN = "";
 let ANSWER = "";
 
-app.use(cors());
 
-// Refreshing only works with a public link, so first vercel, then try this
-async function getRefreshToken() {
+
+app.get('/getToken', function (req, res) {
     let scope = "user-read-currently-playing user-read-playback-state user-modify-playback-state";
     let options = {
         response_type: 'code',
@@ -19,12 +106,10 @@ async function getRefreshToken() {
         scope: scope,
         redirect_uri: REDIRECT_URL
     }
-    request('https://accounts.spotify.com/authorize?' + JSON.stringify(options));
-}
-
-app.get('/getToken', function (req, res) {
-    getRefreshToken();
-    res.send("okay i did, now /showMessage for the message")
+    request('https://accounts.spotify.com/authorize?' + JSON.stringify(options), function (err, response, body) {
+        console.log(body);
+        res.send(body);
+    });
 })
 
 app.get('/showMessage', (req, res) => {
@@ -35,6 +120,7 @@ app.get('/showMessage', (req, res) => {
 app.get('/callback', function (req, res) {
 
     var code = req.query.code || null;
+    console.log("try get token")
 
     var authOptions = {
         url: 'https://accounts.spotify.com/api/token',
@@ -58,14 +144,18 @@ app.get('/callback', function (req, res) {
                 'access_token': access_token,
                 'spotify answer': body
             });
-        } else { res.send("Spotify Error: " + error); console.log("Error from Spotify: " + error) }
+        } else { res.send("Spotify Error: " + error + " STATUS " + response.statusCode + response.statusMessage); console.log("Error from Spotify: " + error + " STATUS " + response.statusCode + response.statusMessage) }
     });
 
 });
 
 
 
+*/
 
+app.get("/", (req, res) => {
+    res.send("Hi!, this is the Spotimy backend :)")
+})
 
 app.get("/getCurrentSong", (req, res) => {
 
@@ -75,7 +165,7 @@ app.get("/getCurrentSong", (req, res) => {
         'headers': {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.ACCESS_TOKEN}`
+            'Authorization': `Bearer ${spotifyApi.getAccessToken()}`
         }
     };
     request(options, function (error, response) {
@@ -106,7 +196,7 @@ app.get("/getQueue", (req, res) => {
         'headers': {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.ACCESS_TOKEN}`
+            'Authorization': `Bearer ${spotifyApi.getAccessToken()}`
         }
     };
     request(options, function (error, response) {
@@ -150,7 +240,7 @@ app.get("/search/?:name/?:artist", (req, res) => {
             'headers': {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.ACCESS_TOKEN}`
+                'Authorization': `Bearer ${spotifyApi.getAccessToken()}`
             }
         };
         request(options, function (error, response) {
@@ -180,7 +270,7 @@ app.get("/addToQueue/:id", (req, res) => {
         'headers': {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.ACCESS_TOKEN}`
+            'Authorization': `Bearer ${spotifyApi.getAccessToken()}`
         }
     };
     request(options, (err, res) => {
@@ -193,7 +283,7 @@ app.get("/addToQueue/:id", (req, res) => {
             'headers': {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.ACCESS_TOKEN}`
+                'Authorization': `Bearer ${spotifyApi.getAccessToken()}`
             }
         }
         request(options, (err, res) => {
