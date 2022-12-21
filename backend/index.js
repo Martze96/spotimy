@@ -292,8 +292,9 @@ app.get("/addToQueue/:id", (req, res) => {
             }
         }
         request(options, (err, res) => {
-            if (err) { console.log(err) } else {
+            if (err) { console.log(err); res.send(null) } else {
                 console.log("song added!");
+                res.send("song added!")
             }
         })
     })
