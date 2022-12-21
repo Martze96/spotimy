@@ -29,10 +29,13 @@ backend: npm start (nodemon script)
 
 
 # TODO
+- Handle flaky vercel requests. If no Song came back, then let the last stay. If no queue was sent back, then stay at last (instead of showing nothing)
+    - try split useffect for song and queue
+    - try above, increase request rate, spray and pray method
 - No song visualization
 - Only input Song or Artist
 - search by trackid (use share song link and grab link from url)
-- Add assets to public folder(then you can add them to readme )
+- assets to public for Readme
 - get access and token
     -> build grant access in frontend
     -> save access Token and make Requests with it (server has to use it in Requests)
