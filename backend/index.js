@@ -72,6 +72,9 @@ app.get('/login', function (req, res) {
 // The code that's returned as a query parameter to the redirect URI
 // Retrieve an access token and a refresh token
 
+app.get("/getAuthUrl", (req, res) => {
+    res.send(authorizeURL)
+})
 
 // clientId, clientSecret and refreshToken has been set on the api object previous to this call.
 function refreshSpotifyToken() {
