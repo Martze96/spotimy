@@ -91,10 +91,12 @@ function refreshSpotifyToken() {
             console.log('Could not refresh access token', err);
         });
 };
-app.on('ready', () => {
+
+app.get("/refreshToken", (req, res) => {
     refreshSpotifyToken();
-    // setInterval(refreshSpotifyToken, 1000 * 59 * 59);
+    res.send("Refreshed token")
 })
+
 
 /*
 const REDIRECT_URL = 'https://spotimy-backend.vercel.app/callback'
