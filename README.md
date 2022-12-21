@@ -32,12 +32,9 @@ backend: npm start (nodemon script)
 - Handle flaky vercel requests. If no Song came back, then let the last stay. If no queue was sent back, then stay at last (instead of showing nothing)
     - try split useffect for song and queue
     - try above, increase request rate, spray and pray method
+    - wrap everything with auth into functions (API Paths) that run on start
 - clean code
 - No song visualization
-- Only input Song or Artist
+- Only input Song or Artist (just learn to pass data in body or smth. stop using this url param)
 - search by trackid (use share song link and grab link from url)
 - assets to public for Readme
-- get access and token
-    -> build grant access in frontend
-    -> save access Token and make Requests with it (server has to use it in Requests)
-    -> save refresh token, set interval? and server should make requests to get new Token

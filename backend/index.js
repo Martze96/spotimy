@@ -5,15 +5,18 @@ const cors = require('cors');
 var request = require('request');
 const env = require('dotenv').config();
 
+const SpotifyWebApi = require('spotify-web-api-node');
+
 const IS_PROD = true;
 const LOCAL_REDIRECT_URI = 'http://192.168.0.67:3000/login';
 const PROD_REDIRECT_URI = 'https://spotimy-backend.vercel.app/login';
 
 app.use(cors());
+
 /**
  * ************ HANDLE AUTH AND TOKEN *********************************
  */
-const SpotifyWebApi = require('spotify-web-api-node');
+
 
 var generateRandomString = function (length) {
     var text = '';
@@ -69,8 +72,6 @@ app.get('/login', function (req, res) {
     );
 
 });
-// The code that's returned as a query parameter to the redirect URI
-// Retrieve an access token and a refresh token
 
 app.get("/getAuthUrl", (req, res) => {
     res.send(authorizeURL)
@@ -97,68 +98,7 @@ app.get("/refreshToken", (req, res) => {
     res.send("Refreshed token")
 })
 
-
-/*
-const REDIRECT_URL = 'https://spotimy-backend.vercel.app/callback'
-const REFRESHTOKEN = "";
-let ANSWER = "";
-
-
-
-app.get('/getToken', function (req, res) {
-    let scope = "user-read-currently-playing user-read-playback-state user-modify-playback-state";
-    let options = {
-        response_type: 'code',
-        client_id: process.env.CLIENT_ID,
-        scope: scope,
-        redirect_uri: REDIRECT_URL
-    }
-    request('https://accounts.spotify.com/authorize?' + JSON.stringify(options), function (err, response, body) {
-        console.log(body);
-        res.send(body);
-    });
-})
-
-app.get('/showMessage', (req, res) => {
-    res.send(ANSWER);
-})
-
-
-app.get('/callback', function (req, res) {
-
-    var code = req.query.code || null;
-    console.log("try get token")
-
-    var authOptions = {
-        url: 'https://accounts.spotify.com/api/token',
-        form: {
-            code: code,
-            redirect_uri: REDIRECT_URL,
-            grant_type: 'authorization_code'
-        },
-        headers: {
-            'Authorization': 'Basic ' + (new Buffer(process.env.CLIENT_ID + ':' + process.env.CLIENT_SECRET).toString('base64'))
-        },
-        json: true
-    };
-    request.post(authOptions, function (error, response, body) {
-        if (!error && response.statusCode === 200) {
-            var access_token = body.access_token;
-            console.log(response);
-            console.log(access_token);
-            ANSWER = body;
-            res.send({
-                'access_token': access_token,
-                'spotify answer': body
-            });
-        } else { res.send("Spotify Error: " + error + " STATUS " + response.statusCode + response.statusMessage); console.log("Error from Spotify: " + error + " STATUS " + response.statusCode + response.statusMessage) }
-    });
-
-});
-
-
-
-*/
+/*******************API********************************************* */
 
 app.get("/", (req, res) => {
     res.send("Hi!, this is the Spotimy backend :)")
