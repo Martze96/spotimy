@@ -32,6 +32,7 @@ backend: npm start (nodemon script)
 - Handle flaky vercel requests. If no Song came back, then let the last stay. If no queue was sent back, then stay at last (instead of showing nothing)
     - try split useffect for song and queue
     - try above, increase request rate, spray and pray method
+- clean code
 - No song visualization
 - Only input Song or Artist
 - search by trackid (use share song link and grab link from url)

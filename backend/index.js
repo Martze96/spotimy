@@ -93,7 +93,7 @@ function refreshSpotifyToken() {
 };
 app.on('ready', () => {
     refreshSpotifyToken();
-    setInterval(refreshSpotifyToken, 1000 * 59 * 59);
+    // setInterval(refreshSpotifyToken, 1000 * 59 * 59);
 })
 
 /*
