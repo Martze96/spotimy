@@ -59,10 +59,12 @@ app.get('/login', function (req, res) {
             // Set the access token on the API object to use it in later calls
             spotifyApi.setAccessToken(data.body['access_token']);
             spotifyApi.setRefreshToken(data.body['refresh_token']);
+            res.send("successfully authenticated!")
         },
         function (err) {
             console.log(code);
             console.log('Something went wrong!', err);
+            res.send("Something went wrong :(")
         }
     );
 
