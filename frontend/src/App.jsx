@@ -65,10 +65,6 @@ function App() {
     axios.get(`${IS_PROD ? PROD_API_SERVER : LOCAL_API_SERVER}/search/${searchName}/${searchArtist}`).then(res => setSearchResults(res.data));
   }
 
-  function getToken() {
-    axios.get(`${IS_PROD ? PROD_API_SERVER : LOCAL_API_SERVER}/getToken`).then(res => { document.open(); document.write(res.data); document.close(); })
-  }
-
   function handleAdd(event) {
     console.log(event.target.parentNode.getAttribute("id"));
     let songId = event.target.parentNode.getAttribute("id");
@@ -84,7 +80,7 @@ function App() {
     const interval = setInterval(() => {
       axios.get(`${IS_PROD ? PROD_API_SERVER : LOCAL_API_SERVER}/getCurrentSong`).then(res => { setCurrentSongInfo(res.data); console.log(res.data) });
       axios.get(`${IS_PROD ? PROD_API_SERVER : LOCAL_API_SERVER}/getQueue`).then(res => { setSongQueue(res.data); console.log(res.data); })
-    }, 3000);
+    }, 5000);
     return () => clearInterval(interval);
   }, [])
 
@@ -99,7 +95,6 @@ function App() {
         <div style={{ fontWeight: 200, padding: "10px" }}>{currentSongInfo[0]}</div>
         <div style={{ fontSize: "1.2rem" }}>{currentSongInfo[1]}</div>
       </div>
-      <div onClick={getToken}>Get a Token!</div>
       <div className="add-song-button" onClick={openModal}>+ Song hinzufügen</div>
       <Modal
         isOpen={modalIsOpen}
