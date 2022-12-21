@@ -25,7 +25,7 @@ const customStyles = {
   },
 };
 const IS_PROD = true;
-const PROD_API_SERVER = "https://spotimy-backend-martze96.vercel.app"
+const PROD_API_SERVER = "https://spotimy-backend.vercel.app"
 const LOCAL_API_SERVER = "http://192.168.0.67:3000"
 
 Modal.setAppElement('#root');
