@@ -205,7 +205,9 @@ app.get("/getQueue", (req, res) => {
         }
     };
     request(options, function (error, response) {
-        if (error) throw new Error(error);
+        if (error) {
+            response.send("could not get Queue. There was an Error")
+        }
         let answer = response.body;
         answer = JSON.parse(answer);
         if (answer?.error || answer === "") {
@@ -238,7 +240,6 @@ app.get("/search/?:name/?:artist", (req, res) => {
     else {
         name = name ? "%20" + name : "";
         artist = artist ? "%20artist:" + artist : "";
-        var request = require('request');
         var options = {
             'method': 'GET',
             'url': `https://api.spotify.com/v1/search?q=${name}${artist}&type=track&limit=10`,
@@ -266,7 +267,7 @@ app.get("/search/?:name/?:artist", (req, res) => {
     }
 })
 
-app.get("/addToQueue/:id", (req, res) => {
+app.get("/addToQueue/:id", (req, res1) => {
     let songId = req.params.id;
 
     var options = {
@@ -278,8 +279,8 @@ app.get("/addToQueue/:id", (req, res) => {
             'Authorization': `Bearer ${spotifyApi.getAccessToken()}`
         }
     };
-    request(options, (err, res) => {
-        let deviceList = JSON.parse(res.body).devices;
+    request(options, (err, res2) => {
+        let deviceList = JSON.parse(res2.body).devices;
         let playingDevice = deviceList.find(device => device['is_active']);
         console.log(playingDevice);
         var options = {
@@ -291,10 +292,11 @@ app.get("/addToQueue/:id", (req, res) => {
                 'Authorization': `Bearer ${spotifyApi.getAccessToken()}`
             }
         }
-        request(options, (err, res) => {
-            if (err) { console.log(err); res.send(null) } else {
+        request(options, (err, res3) => {
+            if (err) { console.log(err); res1.send(null) } else {
                 console.log("song added!");
-                res.send("song added!")
+                res1.send("song added!")
+
             }
         })
     })
