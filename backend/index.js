@@ -11,6 +11,9 @@ const IS_PROD = true;
 const LOCAL_REDIRECT_URI = 'http://192.168.0.67:3000/login';
 const PROD_REDIRECT_URI = 'https://spotimy-backend.vercel.app/login';
 
+let access_token = "";
+let expires_in = "";
+
 app.use(cors());
 
 /**
@@ -58,6 +61,8 @@ app.get('/login', function (req, res) {
             console.log('The token expires in ' + data.body['expires_in']);
             console.log('The access token is ' + data.body['access_token']);
             console.log('The refresh token is ' + data.body['refresh_token']);
+            current_access_token = data.body["access_token"];
+            expires_in = data.body['expires_in'];
 
             // Set the access token on the API object to use it in later calls
             spotifyApi.setAccessToken(data.body['access_token']);
@@ -75,6 +80,10 @@ app.get('/login', function (req, res) {
 
 app.get("/getAuthUrl", (req, res) => {
     res.send(authorizeURL)
+})
+
+app.get("/authstatus", (req, res) => {
+    res.send(current_access_token, expires_in)
 })
 
 // clientId, clientSecret and refreshToken has been set on the api object previous to this call.

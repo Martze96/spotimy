@@ -78,17 +78,30 @@ function App() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      axios.get(`${IS_PROD ? PROD_API_SERVER : LOCAL_API_SERVER}/getCurrentSong`).then(res => { setCurrentSongInfo(res.data); console.log(res.data) });
+      axios.get(`${IS_PROD ? PROD_API_SERVER : LOCAL_API_SERVER}/getCurrentSong`).then(res => {
+        if (res.data === "No Song is currently playing or is not available.") {
+          console.log("Could not get, so i let the CURRENTSONG be.")
+          return;
+        } else {
+          setCurrentSongInfo(res.data);
+          console.log("CURRENT SONG RESPONSE: ", res.data)
+        }
+
+      });
+
+      axios.get(`${IS_PROD ? PROD_API_SERVER : LOCAL_API_SERVER}/getQueue`).then(res => {
+        if (res.data === "Queue is currently empty.") {
+          console.log("could not get the Queue, so I let QUEUE be.")
+          return;
+        } else {
+          setSongQueue(res.data);
+          console.log("CURRENT QUEUE RESPONSE: ", res.data);
+        }
+      })
     }, 5000);
     return () => clearInterval(interval);
   }, [])
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      axios.get(`${IS_PROD ? PROD_API_SERVER : LOCAL_API_SERVER}/getQueue`).then(res => { setSongQueue(res.data); console.log(res.data); })
-    }, 6000);
-    return () => clearInterval(interval);
-  }, [])
 
   return (
     <div className="App" id="App">
