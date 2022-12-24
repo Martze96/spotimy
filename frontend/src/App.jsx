@@ -62,7 +62,13 @@ function App() {
   }
 
   function search() {
-    axios.get(`${IS_PROD ? PROD_API_SERVER : LOCAL_API_SERVER}/search/${searchName}/${searchArtist}`).then(res => setSearchResults(res.data));
+    //axios.get(`${IS_PROD ? PROD_API_SERVER : LOCAL_API_SERVER}/search/${searchName}/${searchArtist}`).then(res => setSearchResults(res.data));
+    axios.get(`${IS_PROD ? PROD_API_SERVER : LOCAL_API_SERVER}/search`, {
+      params: {
+        songname: searchName,
+        artist: searchArtist
+      }
+    }).then(res => setSearchResults(res.data));
   }
 
   function handleAdd(event) {
@@ -70,6 +76,7 @@ function App() {
     let songId = event.target.parentNode.getAttribute("id");
     axios.get(`${IS_PROD ? PROD_API_SERVER : LOCAL_API_SERVER}/addToQueue/${songId}`)
     closeModal();
+    alert("Song geaddet! Es kann ein Momentchen dauern bis dieser in der Liste angezeigt wird :)")
     // need uri of song "spotify:track:4iV5W9uYEdYUVa79Axb7Rh"
     // need id of device "0d1841b0976bae2a3a310dd74c0f3df354899bc8"
   }
@@ -143,7 +150,7 @@ function App() {
                 <div className='searchlist-song-artist'>{item.artist}</div>
                 <div className='searchlist-addtoqueue-button' onClick={handleAdd}>+</div>
               </div>)
-            }) : ""}
+            }) : "Songsuche hat keine Ergebnisse zurückgegeben."}
           </div>
         </div>
       </Modal>

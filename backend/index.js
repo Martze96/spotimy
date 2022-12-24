@@ -183,14 +183,15 @@ app.get("/getQueue", (req, res) => {
     });
 })
 
-app.get("/search/?:name/?:artist", (req, res) => {
-    let name = req.params.name;
-    let artist = req.params.artist;
-    console.log(req.params);
+app.get("/search", (req, res) => {
+    console.log(req.url);
+    let name = req.query.songname;
+    let artist = req.query.artist;
+    console.log(req.query);
     if (!name && !artist) { res.status(404).send('No searchinput given.') }
     else {
-        name = name ? "%20" + name : "";
-        artist = artist ? "%20artist:" + artist : "";
+        name = name ? name + "%20" : "";
+        artist = artist ? "artist:" + artist : "";
         var options = {
             'method': 'GET',
             'url': `https://api.spotify.com/v1/search?q=${name}${artist}&type=track&limit=10`,

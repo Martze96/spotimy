@@ -17,6 +17,10 @@ Copy the access token from the following sites and paste it in the method the ba
 frontend: npm run dev
 backend: npm start (nodemon script)
 
+# 24.12.2022 Update
+- Handling weird vercel requests by not changing the list when nothing is in a response
+- Search function: artist or song, artist and song
+
 # 21.12.2022 Update
 - Implemented Access Token Granting and Refreshing
 - Switch Mode Prod URI and Local URI
@@ -29,12 +33,14 @@ backend: npm start (nodemon script)
 
 
 # TODO
+<del>
 - Handle flaky vercel requests. If no Song came back, then let the last stay. If no queue was sent back, then stay at last (instead of showing nothing)
     - try split useffect for song and queue
     - try above, increase request rate, spray and pray method
     - wrap everything with auth into functions (API Paths) that run on start
-- clean code
-- No song visualization
-- Only input Song or Artist (just learn to pass data in body or smth. stop using this url param)
-- search by trackid (use share song link and grab link from url)
-- assets to public for Readme
+<del>
+- clean code (demand)
+- No song visualization (demand)
+<del>- Only input Song or Artist (just learn to pass data in body or smth. stop using this url param) (core) <del>
+- search by trackid (use share song link and grab link from url) (Core)
+- assets to public for Readme (demand)
