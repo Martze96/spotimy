@@ -38,9 +38,9 @@ backend: npm start (nodemon script)
     - try split useffect for song and queue
     - try above, increase request rate, spray and pray method
     - wrap everything with auth into functions (API Paths) that run on start
-<del>
+</del>
 - clean code (demand)
 - No song visualization (demand)
-<del>- Only input Song or Artist (just learn to pass data in body or smth. stop using this url param) (core) <del>
+<del>- Only input Song or Artist (just learn to pass data in body or smth. stop using this url param) (core) </del>
 - search by trackid (use share song link and grab link from url) (Core)
 - assets to public for Readme (demand)
