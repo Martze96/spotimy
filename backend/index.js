@@ -83,7 +83,7 @@ app.get("/getAuthUrl", (req, res) => {
 })
 
 app.get("/authstatus", (req, res) => {
-    res.send(current_access_token, expires_in)
+    res.send(`Authentification Info: ACCESS-TOKEN EXPIRES IN: ${expires_in}`);
 })
 
 // clientId, clientSecret and refreshToken has been set on the api object previous to this call.
