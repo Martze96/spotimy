@@ -101,10 +101,15 @@ function refreshSpotifyToken() {
 };
 
 // refresh token every hour
-cron.schedule('*/57 * * * *', () => {
-    refreshSpotifyToken();
-    console.log("CRONJOB Executed.")
-})
+
+// cron.schedule('*/57 * * * *', () => {
+//     if (!IS_PROD) {
+//         refreshSpotifyToken();
+//         console.log("CRONJOB Executed.")
+//     }
+
+// }) 
+
 
 app.get("/refreshToken", (req, res) => {
     refreshSpotifyToken();

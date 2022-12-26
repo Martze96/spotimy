@@ -5,17 +5,19 @@ One device of the party is playing spotify music. The webapp communicates with s
 
 npm i in front and backend
 
-Copy the access token from the following sites and paste it in the method the backend function is using
+# How can i make this work on my machine?
 
-## Auth scopes u need:
- * current song: user-read-currently-playing
- * getqueue: user-read-playback-state
- * setqueue: user-modify-playback-state
- * search: no scope
+ For this you need a spotify developer account, register your app, and set the redirect links according to the IP the backend is running
+ Also frontend needs to be addressing the IP the backend is running on.
+ For this change the ADDRESS Constanst and the IS_PROD Variable accordingly to yours.
+
 
 # run 
 frontend: npm run dev
 backend: npm start (nodemon script)
+
+# 26.12.2022 Update
+- Scheduled a cron job that refreshes the access token every 57 minutes
 
 # 24.12.2022 Update
 - Handling weird vercel requests by not changing the list when nothing is in a response
@@ -34,7 +36,7 @@ backend: npm start (nodemon script)
 
 # TODO
 <del>
-- Handle flaky vercel requests. If no Song came back, then let the last stay. If no queue was sent back, then stay at last (instead of showing nothing)
+- Handle unstable vercel requests. If no response came back, then let the last state stay
     - try split useffect for song and queue
     - try above, increase request rate, spray and pray method
     - wrap everything with auth into functions (API Paths) that run on start
