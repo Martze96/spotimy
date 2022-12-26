@@ -4,15 +4,16 @@ const port = 3000;
 const cors = require('cors');
 var request = require('request');
 const env = require('dotenv').config();
-
+const cron = require('node-cron')
 const SpotifyWebApi = require('spotify-web-api-node');
 
 const IS_PROD = true;
 const LOCAL_REDIRECT_URI = 'http://192.168.0.67:3000/login';
 const PROD_REDIRECT_URI = 'https://spotimy-backend.vercel.app/login';
 
-let access_token = "";
 let expires_in = "";
+
+
 
 app.use(cors());
 
@@ -82,10 +83,6 @@ app.get("/getAuthUrl", (req, res) => {
     res.send(authorizeURL)
 })
 
-app.get("/authstatus", (req, res) => {
-    res.send(`Authentification Info: ACCESS-TOKEN EXPIRES IN: ${expires_in}`);
-})
-
 // clientId, clientSecret and refreshToken has been set on the api object previous to this call.
 function refreshSpotifyToken() {
     spotifyApi.refreshAccessToken().then(
@@ -96,11 +93,18 @@ function refreshSpotifyToken() {
             spotifyApi.setAccessToken(data.body['access_token']);
             console.log('The access token is ' + data.body['access_token']);
             console.log('The token expires in ' + data.body['expires_in']);
+            expires_in = data.body['expires_in'];
         },
         function (err) {
             console.log('Could not refresh access token', err);
         });
 };
+
+// refresh token every hour
+cron.schedule('*/57 * * * *', () => {
+    refreshSpotifyToken();
+    console.log("CRONJOB Executed.")
+})
 
 app.get("/refreshToken", (req, res) => {
     refreshSpotifyToken();
