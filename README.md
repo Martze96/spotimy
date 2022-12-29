@@ -50,4 +50,4 @@ backend: npm start (nodemon script)
 <del>- Only input Song or Artist (just learn to pass data in body or smth. stop using this url param) (core) </del>
 - search by trackid (use share song link and grab link from url) (demand)
 - assets to public for Readme (demand)
-- animations when adding a song (demand)
+- animations f. ex. when adding a song (demand) (animista.net)

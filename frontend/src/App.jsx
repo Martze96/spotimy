@@ -76,9 +76,6 @@ function App() {
     let songId = event.target.parentNode.getAttribute("id");
     axios.get(`${IS_PROD ? PROD_API_SERVER : LOCAL_API_SERVER}/addToQueue/${songId}`)
     closeModal();
-    alert("Song geaddet! Es kann ein Momentchen dauern bis dieser in der Liste angezeigt wird :)")
-    // need uri of song "spotify:track:4iV5W9uYEdYUVa79Axb7Rh"
-    // need id of device "0d1841b0976bae2a3a310dd74c0f3df354899bc8"
   }
 
 
@@ -88,7 +85,7 @@ function App() {
       // get current song
       axios.get(`${IS_PROD ? PROD_API_SERVER : LOCAL_API_SERVER}/getCurrentSong`).then(res => {
         if (res.data === "No Song is currently playing or is not available.") {
-          console.log("ERROR: Could not get CURRENTSONG")
+          console.error("ERROR: Could not get CURRENTSONG")
           return;
         } else {
           setCurrentSongInfo(res.data);
@@ -97,7 +94,7 @@ function App() {
         // get Queue
         axios.get(`${IS_PROD ? PROD_API_SERVER : LOCAL_API_SERVER}/getQueue`).then(res => {
           if (res.data === "Queue is currently empty.") {
-            console.log("ERROR: Could not get QUEUE")
+            console.error("ERROR: Could not get QUEUE")
             return;
           } else {
             setSongQueue(res.data);
