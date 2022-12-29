@@ -16,8 +16,12 @@ npm i in front and backend
 frontend: npm run dev
 backend: npm start (nodemon script)
 
+# 29.12.2022 Update
+- fixed request fails!
+- deleted alert when adding a song
+
 # 26.12.2022 Update
-- Scheduled a cron job that refreshes the access token every 57 minutes
+- Scheduled a cron job that refreshes the access token every 57 minutes (only local)
 
 # 24.12.2022 Update
 - Handling weird vercel requests by not changing the list when nothing is in a response
@@ -44,5 +48,6 @@ backend: npm start (nodemon script)
 - clean code (demand)
 - No song visualization (demand)
 <del>- Only input Song or Artist (just learn to pass data in body or smth. stop using this url param) (core) </del>
-- search by trackid (use share song link and grab link from url) (Core)
+- search by trackid (use share song link and grab link from url) (demand)
 - assets to public for Readme (demand)
+- animations when adding a song (demand)
