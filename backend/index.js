@@ -11,10 +11,6 @@ const IS_PROD = true;
 const LOCAL_REDIRECT_URI = 'http://192.168.0.67:3000/login';
 const PROD_REDIRECT_URI = 'https://spotimy-backend.vercel.app/login';
 
-let expires_in = "";
-
-
-
 app.use(cors());
 
 /**
@@ -100,7 +96,7 @@ function refreshSpotifyToken() {
         });
 };
 
-// refresh token every hour
+// refresh token every hour (does not work as serverless function)
 
 // cron.schedule('*/57 * * * *', () => {
 //     if (!IS_PROD) {
@@ -134,7 +130,6 @@ app.get("/getCurrentSong", (req, res) => {
         }
     };
     request(options, function (error, response) {
-        if (error) throw new Error(error);
         if (!response.body || !JSON.parse(response.body).is_playing) {
             res.send("No Song is currently playing or is not available.")
         } else {
@@ -166,6 +161,7 @@ app.get("/getQueue", (req, res) => {
     };
     request(options, function (error, response) {
         if (error) {
+            console.log(error);
             response.send("could not get Queue. There was an Error")
         }
         let answer = response.body;
