@@ -33,10 +33,11 @@ Modal.setAppElement('#root');
 function App() {
   const [currentSongInfo, setCurrentSongInfo] = useState([])
   const [songQueue, setSongQueue] = useState([]);
-  const [queueList, setQueueList] = useState({});
   const [searchName, setSearchName] = useState("");
   const [searchArtist, setSearchArtist] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+
+  const [currentSongImage, setCurrentSongImage] = useState(null);
 
   const [modalIsOpen, setIsOpen] = useState(false);
 
@@ -89,6 +90,7 @@ function App() {
           return;
         } else {
           setCurrentSongInfo(res.data);
+          setCurrentSongImage(res.data[2]);
           console.log("CURRENT SONG RESPONSE: ", res.data)
         }
         // get Queue
@@ -117,7 +119,7 @@ function App() {
       </div>
       <div className="current-song-box">
         <div style={{ padding: "10px" }}>Aktuell wird folgender Song abgespielt:</div>
-        <img src={currentSongInfo[2]} alt="Cover des aktuellen Songs" className='current-song-cover-image' />
+        {currentSongImage ? <img src={currentSongImage} alt="currentsongcover" className='current-song-cover-image' /> : <div class="lds-ripple"><div></div><div></div></div>}
         <div style={{ fontWeight: 200, padding: "10px" }}>{currentSongInfo[0]}</div>
         <div style={{ fontSize: "1.2rem" }}>{currentSongInfo[1]}</div>
       </div>

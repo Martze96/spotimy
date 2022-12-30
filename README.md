@@ -16,6 +16,9 @@ npm i in front and backend
 frontend: npm run dev
 backend: npm start (nodemon script)
 
+# 30.12.2022 Update
+- added loading spinner on current song cover when initially loading the page
+
 # 29.12.2022 Update
 - fixed request fails!
 - deleted alert when adding a song
