@@ -118,7 +118,7 @@ function getCurrentSong() {
         }
     });
 }
-setInterval(getCurrentSong, 4000);
+setInterval(getCurrentSong, Math.floor(Math.random() * (2000) + 2000));
 
 function getQueue() {
     var options = {
@@ -157,7 +157,7 @@ function getQueue() {
 
     });
 }
-setInterval(getQueue, 5000);
+setInterval(getQueue, Math.floor(Math.random() * (3000) + 5000));
 
 /*******************API********************************************* */
 
