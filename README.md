@@ -1,6 +1,16 @@
 # Spotimy
 Spotimy is a webapp that lets your party guest decide what songs are going to play next.
 One device of the party is playing spotify music. The webapp communicates with spotify's web-api (via Playing Device's account) to add songs to the player queue
+
+Frontend built with:
+- React
+
+Backend built with:
+- node.js
+- express
+- SpotifyWebApi
+
+Deployment for testing purposes on vercel (not anymore)
 # setup
 
 npm i in front and backend
