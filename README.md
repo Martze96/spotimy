@@ -16,6 +16,18 @@ npm i in front and backend
 frontend: npm run dev
 backend: npm start (nodemon script)
 
+# Development (Learning) finished 
+Tested out the deployment on vercel, using the app for a party. The app quickly crashed because of too much requests.
+in last update I improved request performance alot (server does his own requests in a interval, client only get a variable value).
+Tested it with while 10 Client are on the frontend, worked perfectly fine, but broke down again while adding a new song.
+It has something to do with vercel's free tier limit or how the serverless functions work there. Behaviour seems like
+if the server has to do a paralell request, it just crashes. Even though I already set Random Time ranges of the interval requests.
+
+
+# 02.01.2022 Update
+- Improved performance of requests
+- refactoring
+
 # 30.12.2022 Update
 - added loading spinner on current song cover when initially loading the page
 
