@@ -31,7 +31,7 @@ const LOCAL_API_SERVER = "http://192.168.0.67:3000"
 Modal.setAppElement('#root');
 
 function App() {
-  const [currentSongInfo, setCurrentSongInfo] = useState([])
+  const [currentSongInfo, setCurrentSongInfo] = useState([]);
   const [songQueue, setSongQueue] = useState([]);
   const [searchName, setSearchName] = useState("");
   const [searchArtist, setSearchArtist] = useState("");
@@ -63,7 +63,8 @@ function App() {
   }
 
   function search() {
-    //axios.get(`${IS_PROD ? PROD_API_SERVER : LOCAL_API_SERVER}/search/${searchName}/${searchArtist}`).then(res => setSearchResults(res.data));
+    if (searchName === '' && searchArtist === '') { return; }
+
     axios.get(`${IS_PROD ? PROD_API_SERVER : LOCAL_API_SERVER}/search`, {
       params: {
         songname: searchName,
@@ -119,7 +120,7 @@ function App() {
       </div>
       <div className="current-song-box">
         <div style={{ padding: "10px" }}>Aktuell wird folgender Song abgespielt:</div>
-        {currentSongImage ? <img src={currentSongImage} alt="currentsongcover" className='current-song-cover-image' /> : <div class="lds-ripple"><div></div><div></div></div>}
+        {currentSongImage ? <img src={currentSongImage} alt="currentsongcover" className='current-song-cover-image' /> : <div className="lds-ripple"><div></div><div></div></div>}
         <div style={{ fontWeight: 200, padding: "10px" }}>{currentSongInfo[0]}</div>
         <div style={{ fontSize: "1.2rem" }}>{currentSongInfo[1]}</div>
       </div>
@@ -161,7 +162,7 @@ function App() {
         <div className="queue-list">
           {/*queueList*/}
           {songQueue[0]?.name ? songQueue.map(item => {
-            return (<div className='queue-list-entry'>
+            return (<div className='queue-list-entry' key={item.name}>
               <img src={item.image} alt="queuesongcover" className='queue-list-entry-cover' />
               <div className='queuelist-song-name'>{item.name}</div>
               <div className='queuelist-song-artist'>{item.artist}</div>

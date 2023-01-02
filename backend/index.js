@@ -6,6 +6,8 @@ var request = require('request');
 const env = require('dotenv').config();
 const cron = require('node-cron')
 const SpotifyWebApi = require('spotify-web-api-node');
+const generateRandomString = require('./helper');
+
 
 const IS_PROD = true;
 const LOCAL_REDIRECT_URI = 'http://192.168.0.67:3000/login';
@@ -17,84 +19,66 @@ app.use(cors());
  * ************ HANDLE AUTH AND TOKEN *********************************
  */
 
-
-var generateRandomString = function (length) {
-    var text = '';
-    var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-    for (var i = 0; i < length; i++) {
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-
-    return text;
-};
-
-var scopes = ['user-read-currently-playing', 'user-read-playback-state', 'user-modify-playback-state'],
+// define scopes
+let scopes = ['user-read-currently-playing', 'user-read-playback-state', 'user-modify-playback-state'],
     redirectUri = `${IS_PROD ? PROD_REDIRECT_URI : LOCAL_REDIRECT_URI}`,
     clientId = process.env.CLIENT_ID,
     clientSecret = process.env.CLIENT_SECRET,
     state = generateRandomString(16);
 
-// Setting credentials can be done in the wrapper's constructor, or using the API object's setters.
-var spotifyApi = new SpotifyWebApi({
+// initializing spotifyWebApi
+let spotifyApi = new SpotifyWebApi({
     redirectUri: redirectUri,
     clientId: clientId,
     clientSecret: clientSecret
 });
 
-// Create the authorization URL
-var authorizeURL = spotifyApi.createAuthorizeURL(scopes, state);
+let CURRENT_SONG;
+let CURRENT_QUEUE;
 
-// https://accounts.spotify.com:443/authorize?client_id=5fe01282e44241328a84e7c5cc169165&response_type=code&redirect_uri=https://example.com/callback&scope=user-read-private%20user-read-email&state=some-state-of-my-choice
-console.log(authorizeURL);
 
-let code;
+
+app.get("/auth", (req, res) => {
+    // Create the authorization URL, redirect to it
+    let authorizeURL = spotifyApi.createAuthorizeURL(scopes, state);
+    res.redirect(authorizeURL)
+})
+
+// auth redirect uri handlerfunction
 app.get('/login', function (req, res) {
-    code = req.query.code;
-    console.log(code);
-
-    spotifyApi.authorizationCodeGrant(code).then(
+    spotifyApi.authorizationCodeGrant(req.query.code).then(
         function (data) {
-            console.log('The token expires in ' + data.body['expires_in']);
-            console.log('The access token is ' + data.body['access_token']);
-            console.log('The refresh token is ' + data.body['refresh_token']);
-            current_access_token = data.body["access_token"];
-            expires_in = data.body['expires_in'];
-
-            // Set the access token on the API object to use it in later calls
-            spotifyApi.setAccessToken(data.body['access_token']);
-            spotifyApi.setRefreshToken(data.body['refresh_token']);
-            res.send("successfully authenticated!")
+            if (data.statusCode === 200) {
+                spotifyApi.setAccessToken(data.body['access_token']);
+                spotifyApi.setRefreshToken(data.body['refresh_token']);
+                res.send("successfully authenticated!")
+            }
         },
         function (err) {
-            console.log(code);
-            console.log('Something went wrong!', err);
-            res.send("Something went wrong :(")
+            console.log(err);
+            res.send("Something went wrong :( - " + err)
         }
     );
 
 });
 
-app.get("/getAuthUrl", (req, res) => {
-    res.send(authorizeURL)
-})
-
-// clientId, clientSecret and refreshToken has been set on the api object previous to this call.
-function refreshSpotifyToken() {
+app.get("/refresh-token", (req, res) => {
     spotifyApi.refreshAccessToken().then(
         function (data) {
-            console.log('The access token has been refreshed!');
-
-            // Save the access token so that it's used in future calls
-            spotifyApi.setAccessToken(data.body['access_token']);
-            console.log('The access token is ' + data.body['access_token']);
-            console.log('The token expires in ' + data.body['expires_in']);
-            expires_in = data.body['expires_in'];
+            if (data.statusCode === 200) {
+                spotifyApi.setAccessToken(data.body['access_token']);
+                spotifyApi.setRefreshToken(data.body['refresh_token']);
+                console.log(data.body);
+                res.status(200).send("Token successfully refreshed.")
+            }
         },
         function (err) {
-            console.log('Could not refresh access token', err);
+            res.status(400).send("Redirecting error to client: " + err);
         });
-};
+})
+
+
+
 
 // refresh token every hour (does not work as serverless function)
 
@@ -106,20 +90,9 @@ function refreshSpotifyToken() {
 
 // }) 
 
+/****************SERVER INTERVAL JOBS *************************************** */
 
-app.get("/refreshToken", (req, res) => {
-    refreshSpotifyToken();
-    res.send("Refreshed token")
-})
-
-/*******************API********************************************* */
-
-app.get("/", (req, res) => {
-    res.send("Hi!, this is the Spotimy backend :)")
-})
-
-app.get("/getCurrentSong", (req, res) => {
-
+function getCurrentSong() {
     var options = {
         'method': 'GET',
         'url': 'https://api.spotify.com/v1/me/player/currently-playing?market=ES',
@@ -130,8 +103,9 @@ app.get("/getCurrentSong", (req, res) => {
         }
     };
     request(options, function (error, response) {
+        if (error) { CURRENT_SONG = "Error while requesting spotify api"; console.log(error) };
         if (!response.body || !JSON.parse(response.body).is_playing) {
-            res.send("No Song is currently playing or is not available.")
+            CURRENT_SONG = "No Song is currently playing or is not available.";
         } else {
             let answer = response.body ? JSON.parse(response.body) : "No Song currently Playing.";
             let currentTrack;
@@ -140,16 +114,13 @@ app.get("/getCurrentSong", (req, res) => {
             let songImage = answer?.item?.album?.images[0] ? answer.item.album.images[0].url : "No Image found.";
             currentTrack = [songArtist, songName, songImage];
 
-            res.send(currentTrack);
+            CURRENT_SONG = currentTrack;
         }
-
     });
-})
+}
+setInterval(getCurrentSong, 4000);
 
-/**
- * get Users Play Queue
- */
-app.get("/getQueue", (req, res) => {
+function getQueue() {
     var options = {
         'method': 'GET',
         'url': 'https://api.spotify.com/v1/me/player/queue',
@@ -162,13 +133,12 @@ app.get("/getQueue", (req, res) => {
     request(options, function (error, response) {
         if (error) {
             console.log(error);
-            response.send("could not get Queue. There was an Error")
+            CURRENT_QUEUE = "could not get Queue. There was an Error";
         }
         let answer = response.body;
         answer = JSON.parse(answer);
         if (answer?.error || answer === "") {
             console.log("queue empty or not reachable...")
-            res.send("Queue is currently empty.");
         } else {
             let queueTracks = [];
             for (let i = 0; i < Object.keys(answer.queue).length; i++) {
@@ -182,18 +152,35 @@ app.get("/getQueue", (req, res) => {
                 });
             }
             console.log("sending queue...")
-            res.send(queueTracks);
+            CURRENT_QUEUE = queueTracks;
         }
 
     });
+}
+setInterval(getQueue, 5000);
+
+/*******************API********************************************* */
+
+app.get("/", (req, res) => {
+    res.send("Hi!, this is the Spotimy backend :)")
+})
+
+app.get("/getCurrentSong", (req, res) => {
+    res.send(CURRENT_SONG);
+})
+
+/**
+ * get Users Play Queue
+ */
+app.get("/getQueue", (req, res) => {
+    res.send(CURRENT_QUEUE);
 })
 
 app.get("/search", (req, res) => {
-    console.log(req.url);
     let name = req.query.songname;
     let artist = req.query.artist;
-    console.log(req.query);
-    if (!name && !artist) { res.status(404).send('No searchinput given.') }
+    console.log("searching song title " + name + " from " + artist);
+    if (name === '' && artist === '') { res.status(400).send('No searchinput given.') }
     else {
         name = name ? name + "%20" : "";
         artist = artist ? "artist:" + artist : "";
@@ -207,7 +194,7 @@ app.get("/search", (req, res) => {
             }
         };
         request(options, function (error, response) {
-            if (error) throw new Error(error);
+            if (error) { res.status(400).send(error); }
             let tracks = JSON.parse(response.body).tracks.items;
             let searchResult = [];
             for (let i = 0; i < tracks.length; i++) {
