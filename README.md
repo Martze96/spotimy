@@ -73,6 +73,7 @@ if the server has to do a paralell request, it just crashes. Even though I alrea
 - clean code (demand)
 - No song visualization (demand)
 <del>- Only input Song or Artist (just learn to pass data in body or smth. stop using this url param) (core) </del>
+
 - search by trackid (use share song link and grab link from url) (demand)
 - assets to public for Readme (demand)
 - animations f. ex. when adding a song (demand) (animista.net)
